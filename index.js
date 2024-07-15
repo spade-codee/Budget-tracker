@@ -2,12 +2,15 @@ const form = document.querySelector(".add")
 const incomeList = document.querySelector("ul.income-list")
 const expenseList = document.querySelector("ul.expense-list")
 
-
 const balance = document.getElementById("balance")
 const income = document.getElementById("income")
 const expense = document.getElementById("expense")
 
 let transactions= localStorage.getItem("transactions") !== null ? JSON.parse(localStorage.getItem("transactions")) : [];
+
+function formatAmount(amount) {
+    return '₦' + amount.toLocaleString('en-US') + ".00k";
+}
 
 function updateStatistics() {
     const updatedIncome = transactions
@@ -21,9 +24,9 @@ function updateStatistics() {
                     .reduce((total, transaction)=>total += Math.abs(transaction.amount), 0)
 
      updatedBalance =  updatedIncome - updatedExpense
-     balance.textContent = updatedBalance
-     income.textContent = updatedIncome ;
-     expense.textContent = updatedExpense;
+     balance.textContent = formatAmount(updatedBalance)
+     income.textContent = formatAmount( updatedIncome) ;
+     expense.textContent = formatAmount(updatedExpense);
 }
 
 
@@ -33,7 +36,7 @@ function generateTemplate(id,source,amount,time){
                                         <span>${source}</span>
                                         <span id="time">${time}</span>
                                     </p>
-                                    $<span>${Math.abs(amount)}</span>
+                                    ₦<span>${Math.abs(amount)}</span>
                                     <i class="bi bi-trash delete"></i>
                                 </li>`
 }
@@ -59,6 +62,7 @@ function addTransaction (source,amount){
     transactions.push(transaction)
 localStorage.setItem("transactions", JSON.stringify(transactions))
 addTransactionDOM(transaction.id, source, amount,transaction.time)
+updateStatistics()
 }
 
 form.addEventListener("submit", event =>{
@@ -80,7 +84,7 @@ function getTransaction(){
             expenseList.innerHTML += generateTemplate(transactions.id,transactions.source, transactions.amount,transactions.time) ;
 
         }
-        
+        updateStatistics()
     });
 }
 
